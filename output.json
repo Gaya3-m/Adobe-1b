@@ -1,0 +1,372 @@
+{
+  "metadata": {
+    "input_documents": [
+      "South of France - Cities.pdf",
+      "South of France - Cuisine.pdf",
+      "South of France - History.pdf",
+      "South of France - Restaurants and Hotels.pdf",
+      "South of France - Things to Do.pdf",
+      "South of France - Tips and Tricks.pdf",
+      "South of France - Traditions and Culture.pdf"
+    ],
+    "persona": "Travel Planner",
+    "job_to_be_done": "Plan a trip of 4 days for a group of 10 college friends.",
+    "processing_timestamp": "2025-07-24T20:46:54.117370",
+    "processing_time_seconds": 7.176541090011597,
+    "config": {
+      "challenge_info": {
+        "challenge_id": "round_1b_002",
+        "test_case_name": "travel_planner",
+        "description": "France Travel"
+      },
+      "documents": [
+        {
+          "filename": "South of France - Cities.pdf",
+          "title": "South of France - Cities"
+        },
+        {
+          "filename": "South of France - Cuisine.pdf",
+          "title": "South of France - Cuisine"
+        },
+        {
+          "filename": "South of France - History.pdf",
+          "title": "South of France - History"
+        },
+        {
+          "filename": "South of France - Restaurants and Hotels.pdf",
+          "title": "South of France - Restaurants and Hotels"
+        },
+        {
+          "filename": "South of France - Things to Do.pdf",
+          "title": "South of France - Things to Do"
+        },
+        {
+          "filename": "South of France - Tips and Tricks.pdf",
+          "title": "South of France - Tips and Tricks"
+        },
+        {
+          "filename": "South of France - Traditions and Culture.pdf",
+          "title": "South of France - Traditions and Culture"
+        }
+      ],
+      "persona": {
+        "role": "Travel Planner"
+      },
+      "job_to_be_done": {
+        "task": "Plan a trip of 4 days for a group of 10 college friends."
+      }
+    }
+  },
+  "extracted_sections": [
+    {
+      "document": "South of France - Tips and Tricks.pdf",
+      "section_title": "Document Start",
+      "page_number": 1,
+      "importance_rank": 1,
+      "section_level": "chapter"
+    },
+    {
+      "document": "South of France - Tips and Tricks.pdf",
+      "section_title": "Tips and Tricks for Packing",
+      "page_number": 8,
+      "importance_rank": 2,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Cities.pdf",
+      "section_title": "Travel Tips",
+      "page_number": 2,
+      "importance_rank": 8,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Restaurants and Hotels.pdf",
+      "section_title": "Conclusion",
+      "page_number": 14,
+      "importance_rank": 14,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Things to Do.pdf",
+      "section_title": "Document Start",
+      "page_number": 10,
+      "importance_rank": 15,
+      "section_level": "chapter"
+    },
+    {
+      "document": "South of France - Cities.pdf",
+      "section_title": "Student Life",
+      "page_number": 10,
+      "importance_rank": 16,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Things to Do.pdf",
+      "section_title": "Water Activities",
+      "page_number": 4,
+      "importance_rank": 17,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Restaurants and Hotels.pdf",
+      "section_title": "Budget -Friendly Hotels",
+      "page_number": 8,
+      "importance_rank": 26,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Traditions and Culture.pdf",
+      "section_title": "Document Start",
+      "page_number": 3,
+      "importance_rank": 44,
+      "section_level": "chapter"
+    },
+    {
+      "document": "South of France - History.pdf",
+      "section_title": "Introduction",
+      "page_number": 1,
+      "importance_rank": 53,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Cuisine.pdf",
+      "section_title": "Culinary Experiences",
+      "page_number": 6,
+      "importance_rank": 54,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - History.pdf",
+      "section_title": "Montpellier: A University City with Medieval Charm",
+      "page_number": 10,
+      "importance_rank": 60,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Traditions and Culture.pdf",
+      "section_title": "Pilgrimages",
+      "page_number": 4,
+      "importance_rank": 64,
+      "section_level": "section"
+    },
+    {
+      "document": "South of France - Cuisine.pdf",
+      "section_title": "Must -Visit Restaurants",
+      "page_number": 4,
+      "importance_rank": 92,
+      "section_level": "section"
+    }
+  ],
+  "subsection_analysis": [
+    {
+      "document": "South of France - Tips and Tricks.pdf",
+      "page_number": 8,
+      "refined_text": "• Pack a Day Bag: Bring a small day bag for daily excursions.",
+      "importance_rank": 1,
+      "semantic_score": 0.4976642060212554
+    },
+    {
+      "document": "South of France - Tips and Tricks.pdf",
+      "page_number": 1,
+      "refined_text": "The Ultimate South of France Travel Companion: Your Comprehensive Guide to Packing,",
+      "importance_rank": 1,
+      "semantic_score": 0.42422465674865634
+    },
+    {
+      "document": "South of France - History.pdf",
+      "page_number": 1,
+      "refined_text": "This guide will take you through the histories of major cities, famous historical sites, and other points of interest to help you plan an enriching and unforgettable trip.",
+      "importance_rank": 1,
+      "semantic_score": 0.4176146422361676
+    },
+    {
+      "document": "South of France - Restaurants and Hotels.pdf",
+      "page_number": 8,
+      "refined_text": "The modern amenities and\nconvenient location make it a great choice for budget -conscious travelers.",
+      "importance_rank": 1,
+      "semantic_score": 0.4091971034964555
+    },
+    {
+      "document": "South of France - Restaurants and Hotels.pdf",
+      "page_number": 8,
+      "refined_text": "The modern amenities and convenient location make it a great choice for budget -conscious travelers.",
+      "importance_rank": 2,
+      "semantic_score": 0.4091971034964555
+    },
+    {
+      "document": "South of France - Restaurants and Hotels.pdf",
+      "page_number": 8,
+      "refined_text": "The modern amenities and convenient location\nmake it a great choice for budget -conscious travelers.",
+      "importance_rank": 3,
+      "semantic_score": 0.4091971034964555
+    },
+    {
+      "document": "South of France - Tips and Tricks.pdf",
+      "page_number": 8,
+      "refined_text": "• Additional Tips:  Pack a small travel umbrella, a reusable shopping bag, and a\nportable phone charger.",
+      "importance_rank": 2,
+      "semantic_score": 0.3977178220971892
+    },
+    {
+      "document": "South of France - Cuisine.pdf",
+      "page_number": 4,
+      "refined_text": "The menu changes with the seasons, ensuring that each visit is a new and exciting experience.",
+      "importance_rank": 1,
+      "semantic_score": 0.3283058663823568
+    },
+    {
+      "document": "South of France - Cities.pdf",
+      "page_number": 2,
+      "refined_text": "Learning a few basic French phrases can enhance your travel experience.",
+      "importance_rank": 1,
+      "semantic_score": 0.32698919419011413
+    },
+    {
+      "document": "South of France - Restaurants and Hotels.pdf",
+      "page_number": 14,
+      "refined_text": "Whether you're looking for budget -friendly  eateries, family -friendly\nspots, upscale dining, or luxurious experiences, this guide will help you find the perfect places to eat and stay during your trip.",
+      "importance_rank": 1,
+      "semantic_score": 0.32634629208683563
+    },
+    {
+      "document": "South of France - Tips and Tricks.pdf",
+      "page_number": 8,
+      "refined_text": "• Leave Room for Souvenirs:  Leave extra space or bring a foldable bag for  souvenirs.",
+      "importance_rank": 3,
+      "semantic_score": 0.3141740286697513
+    },
+    {
+      "document": "South of France - Cuisine.pdf",
+      "page_number": 6,
+      "refined_text": "Many wineries oﬀer guided tours and tastings, giving you the opportunity to sample a variety of wines and discover new favorites.",
+      "importance_rank": 1,
+      "semantic_score": 0.3102115865075309
+    },
+    {
+      "document": "South of France - Restaurants and Hotels.pdf",
+      "page_number": 14,
+      "refined_text": "From the vibrant cities of Nice and Marseille to the charming villages of Provence, the South of France promises an unforgettable travel experience.",
+      "importance_rank": 2,
+      "semantic_score": 0.30055348770557744
+    },
+    {
+      "document": "South of France - Cities.pdf",
+      "page_number": 10,
+      "refined_text": "• University Influence: Highlight the vibrant student life and the influence of the university on the city's culture.",
+      "importance_rank": 1,
+      "semantic_score": 0.29776172506101184
+    },
+    {
+      "document": "South of France - Cities.pdf",
+      "page_number": 2,
+      "refined_text": "• Transportation : The region is well -connected by an extensive network of trains,\nbuses, and flights.",
+      "importance_rank": 2,
+      "semantic_score": 0.28213805537885817
+    },
+    {
+      "document": "South of France - Cuisine.pdf",
+      "page_number": 6,
+      "refined_text": "Some classes even\ninclude a visit to a local market to shop for  fresh ingredients.",
+      "importance_rank": 2,
+      "semantic_score": 0.2804782405363717
+    },
+    {
+      "document": "South of France - Cities.pdf",
+      "page_number": 2,
+      "refined_text": "Renting a car is also a great option for exploring the countryside\nand smaller towns.",
+      "importance_rank": 3,
+      "semantic_score": 0.272613526293379
+    },
+    {
+      "document": "South of France - Cuisine.pdf",
+      "page_number": 6,
+      "refined_text": "These classes are a great way to immerse yourself in the local culture and gain hands -on experience with regional recipes.",
+      "importance_rank": 3,
+      "semantic_score": 0.2554063289395296
+    },
+    {
+      "document": "South of France - Things to Do.pdf",
+      "page_number": 10,
+      "refined_text": "• Carcassonne: Take a guided tour of the medieval citadel and learn about its history and architecture.",
+      "importance_rank": 1,
+      "semantic_score": 0.2350083653300723
+    },
+    {
+      "document": "South of France - Cuisine.pdf",
+      "page_number": 4,
+      "refined_text": "The\nrestaurant's tasting menu oﬀers a journey through the flavors of Provence, with each course showcasing the region's finest ingredients.",
+      "importance_rank": 2,
+      "semantic_score": 0.23092571269013196
+    },
+    {
+      "document": "South of France - Things to Do.pdf",
+      "page_number": 10,
+      "refined_text": "• Nîmes: Visit the Roman amphitheater and learn about ancient Roman history.",
+      "importance_rank": 2,
+      "semantic_score": 0.22139396153101176
+    },
+    {
+      "document": "South of France - Traditions and Culture.pdf",
+      "page_number": 3,
+      "refined_text": "accompanied by shepherds and their dogs.",
+      "importance_rank": 1,
+      "semantic_score": 0.21566369099906701
+    },
+    {
+      "document": "South of France - Things to Do.pdf",
+      "page_number": 4,
+      "refined_text": "• Dordogne River : Enjoy a leisurely canoe trip, passing by medieval castles and\ncharming villages.",
+      "importance_rank": 1,
+      "semantic_score": 0.21049537315220523
+    },
+    {
+      "document": "South of France - Restaurants and Hotels.pdf",
+      "page_number": 14,
+      "refined_text": "The South of France oﬀers a wide range of dining and accommodation options to suit every\nbudget and preference.",
+      "importance_rank": 3,
+      "semantic_score": 0.19904220671689282
+    },
+    {
+      "document": "South of France - Things to Do.pdf",
+      "page_number": 10,
+      "refined_text": "• Monaco: Explore the Musée Océanographique and its marine exhibits, including a\nshark lagoon and touch tanks.",
+      "importance_rank": 3,
+      "semantic_score": 0.18808846452830738
+    },
+    {
+      "document": "South of France - Things to Do.pdf",
+      "page_number": 4,
+      "refined_text": "• Gorges du Verdon : Rent a kayak or paddleboat to explore the turquoise waters.",
+      "importance_rank": 2,
+      "semantic_score": 0.1871879273849792
+    },
+    {
+      "document": "South of France - Traditions and Culture.pdf",
+      "page_number": 4,
+      "refined_text": "The town of Lourdes,\nlocated in the Pyrenees, is one of the most famous, attracting millions of visitors each year.",
+      "importance_rank": 1,
+      "semantic_score": 0.18478798141901148
+    },
+    {
+      "document": "South of France - Things to Do.pdf",
+      "page_number": 4,
+      "refined_text": "• Ardèche River: Paddle through the stunning Ardèche Gorge.",
+      "importance_rank": 3,
+      "semantic_score": 0.17372115074358832
+    },
+    {
+      "document": "South of France - History.pdf",
+      "page_number": 10,
+      "refined_text": "The city has a rich history, with a blend of medieval, Renaissance, and modern architecture.",
+      "importance_rank": 1,
+      "semantic_score": 0.16510161822719238
+    },
+    {
+      "document": "South of France - Cuisine.pdf",
+      "page_number": 4,
+      "refined_text": "The restaurant's terrace oﬀers panoramic views of the Mediterranean, making it the perfect spot f or a romantic dinner.",
+      "importance_rank": 3,
+      "semantic_score": 0.16431754041814178
+    }
+  ]
+}
