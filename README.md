@@ -10,7 +10,7 @@ This project extracts and prioritizes document sections based on a user persona 
 ## Setup
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/AnshKumar6400/Adobe-1b.git
+   git clone https://github.com/Gaya3-m/Adobe-1b.git
    cd Adobe-1b
    ```
 2. **(Recommended) Create and activate a virtual environment:**
