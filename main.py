@@ -24,6 +24,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 from keybert import KeyBERT
 from sklearn.cluster import AgglomerativeClustering
 
+input_dir = os.path.join(os.getcwd(), "input")
+output_dir = os.path.join(os.getcwd(), "output")
+os.makedirs(output_dir, exist_ok=True)
+
 # Initialize NLTK
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
@@ -523,7 +527,7 @@ class DocumentAnalyzer:
 
 
 def load_config(input_json: str) -> dict:
-    """Load and validate configuration, fallback to auto-detect PDFs in 'inputs/' folder."""
+    """Load and validate configuration, fallback to auto-detect PDFs in 'input/' folder."""
     try:
         if os.path.exists(input_json):
             with open(input_json, 'r', encoding='utf-8') as f:
@@ -535,16 +539,16 @@ def load_config(input_json: str) -> dict:
         documents = []
         for doc in config.get('documents', []):
             if isinstance(doc, str):
-                documents.append(doc)
+                documents.append(os.path.join(input_dir, doc))
             elif isinstance(doc, dict) and 'filename' in doc:
-                documents.append(doc['filename'])
+                documents.append(os.path.join(input_dir, doc['filename']))
 
-        # If documents not found in input.json, auto-detect from ./inputs
+        # If documents not found in input.json, auto-detect from input_dir
         if not documents:
             documents = []
-            for file in os.listdir("inputs"):
+            for file in os.listdir(input_dir):
                 if file.lower().endswith(".pdf"):
-                    documents.append(os.path.join("inputs", file))
+                    documents.append(os.path.join(input_dir, file))
 
         # Extract persona
         persona = config.get('persona', '')
@@ -575,7 +579,7 @@ def load_config(input_json: str) -> dict:
 def main():
     parser = argparse.ArgumentParser(description="Enhanced Document Intelligence System")
     parser.add_argument("--input_json", required=True, help="Input configuration JSON")
-    parser.add_argument("--output", default="output.json", help="Output file path")
+    parser.add_argument("--output", default=os.path.join(output_dir, "output.json"), help="Output file path")
     args = parser.parse_args()
 
     try:
@@ -586,7 +590,7 @@ def main():
             config['persona'],
             config['job']
         )
-        
+
         # Prepare output in evaluation-compatible format
         output = {
             'extracted_sections': [
@@ -613,12 +617,12 @@ def main():
                 'config': config['config']
             }
         }
-        
+
         with open(args.output, 'w', encoding='utf-8') as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
-        
+
         print(f"Success! Results saved to {args.output}")
-    
+
     except Exception as e:
         print(f"Error: {str(e)}")
 
