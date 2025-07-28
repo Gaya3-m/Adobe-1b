@@ -1,14 +1,14 @@
 # Use a lightweight Python base image
 FROM python:3.10-slim
 
-# Set environment variables
+# Environment settings
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies required for poppler and basic NLP
+# Install system dependencies for PDF processing and NLP
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpoppler-cpp-dev \
@@ -19,21 +19,20 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements.txt before copying full app for better cache usage
+# Copy requirements file separately to leverage Docker cache
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Download NLTK data offline if needed
-# (Optional: you can include `punkt`, `stopwords` if you use them in extract_keyphrases)
 RUN python -m nltk.downloader punkt stopwords
 
-# Copy the application code
+# Copy application code
 COPY . .
 
-# Make input directory (optional)
+# Optional input directory
 RUN mkdir -p inputs
 
-# Run the main app (you can override this in docker run if needed)
+# Default command to run the application
 CMD ["python", "main.py", "--input_json", "input.json", "--output", "output.json"]
