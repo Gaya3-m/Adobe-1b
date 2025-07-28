@@ -10,7 +10,7 @@ import re
 import time
 from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import argparse
 from collections import defaultdict
@@ -28,6 +28,7 @@ from sklearn.cluster import AgglomerativeClustering
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
 
+
 @dataclass
 class DocumentSection:
     document: str
@@ -35,7 +36,20 @@ class DocumentSection:
     section_title: str
     content: str
     importance_rank: int = 0
-    section_level: str = "section"  # chapter, section, subsection
+    section_level: str = "section"
+    confidence: float = field(init=False)
+
+    def __post_init__(self):
+        self.confidence = self.compute_confidence()
+
+    def compute_confidence(self):
+        content_score = min(len(self.content.split()) / 100.0, 1.0)
+        title_score = 0.0 if self.section_title.strip().lower() in {
+            "introduction", "overview", "agenda", "summary", "conclusion"
+        } else 1.0
+        return 0.7 * content_score + 0.3 * title_score
+
+
 
 @dataclass
 class SubSection:
@@ -88,9 +102,44 @@ class DocumentAnalyzer:
     def __init__(self):
         self.semantic = SemanticProcessor()
         self.generic_titles = [
-            "introduction", "overview", "background", 
-            "conclusion", "summary", "abstract"
+            "introduction", "overview", "abstract", "contents", "table of contents",
+        "foreword", "preface", "about the author", "acknowledgments", "references",
+        "bibliography", "index", "appendix", "glossary", "summary", "conclusion",
+        "contact", "legal notice", "copyright", "disclaimer", "version history"
         ]
+
+    def _is_potential_heading(self, title: str) -> bool:
+    # """Check if a line is a potential heading using heuristics"""
+        if len(title.strip()) < 3:
+            return False
+        if title.lower() in self.generic_titles:
+            return False
+        if title.strip().endswith(":"):  # headings often do
+            return True
+        if title.isupper() or title.istitle():  # common heading patterns
+            return True
+        return False
+
+    def _classify_heading_level(self, heading: str, embeddings: list, index: int) -> str:
+    # """
+    # Assign H1, H2, or H3 level based on position and cosine similarity
+    # with neighboring headings.
+    # """
+        if index == 0:
+            return "H1"
+
+        prev_emb = embeddings[index - 1]
+        curr_emb = embeddings[index]
+
+        similarity = cosine_similarity([curr_emb], [prev_emb])[0][0]
+
+        if similarity > 0.85:
+            return "H3"
+        elif similarity > 0.6:
+            return "H2"
+        else:
+            return "H1"
+        
 
     def extract_text_from_pdf(self, pdf_path: str) -> Dict[int, str]:
         """Extract text from PDF with page numbers"""
@@ -187,56 +236,63 @@ class DocumentAnalyzer:
         }
 
     def calculate_section_score(self, section: Tuple[str, str, str], profile: Dict) -> float:
-        """Multidimensional relevance scoring"""
+    # """Multidimensional relevance scoring with generalization-awareness"""
         title, content, level = section
         full_text = f"{title}. {content}"
-        
+        full_text_lower = full_text.lower()
+
         # 1. Semantic similarity
         embedding = self.semantic.get_embedding(full_text)
         semantic_score = float(cosine_similarity(
-            np.array(profile['embedding']).reshape(1, -1),  # Convert back to numpy array
+            np.array(profile['embedding']).reshape(1, -1),
             embedding.reshape(1, -1)
         )[0][0])
-        
-        # 2. Keyphrase overlap
-        keyphrase_score = sum(
-            1 for kp in profile['keyphrases'] 
-            if re.search(r'\b' + re.escape(kp) + r'\b', full_text.lower())
-        ) / len(profile['keyphrases']) if profile['keyphrases'] else 0
-        
-        # 3. Content type alignment
+
+        # 2. Keyphrase soft overlap (partial matches allowed)
+        keyphrase_matches = sum(
+            1 for kp in profile['keyphrases']
+            if kp.lower() in full_text_lower
+        )
+        keyphrase_score = keyphrase_matches / len(profile['keyphrases']) if profile['keyphrases'] else 0
+
+        # 3. Content type alignment (broader match on noun types)
         content_score = sum(
-            weight * self._score_content_type(content.lower(), ctype)
+            weight * self._score_content_type(full_text_lower, ctype)
             for ctype, weight in profile['content_weights'].items()
         )
-        
+
         # 4. Contextual boosting
         context_boost = 1.0
         ctx = profile['context']
-        if ctx['is_group'] and any(w in content.lower() for w in ['group', 'together']):
-            context_boost *= 1.5
-        if ctx['is_student'] and any(w in content.lower() for w in ['student', 'budget']):
+        if ctx.get('is_group') and any(w in full_text_lower for w in ['group', 'shared', 'together']):
+            context_boost *= 1.4
+        if ctx.get('is_student') and any(w in full_text_lower for w in ['student', 'budget', 'cheap']):
             context_boost *= 1.3
-        
-        # 5. Level importance
+
+        # 5. Section level weight
         level_weight = {
-            'chapter': 1.5,
-            'section': 1.2,
+            'chapter': 1.4,
+            'section': 1.15,
             'subsection': 1.0
-        }.get(level, 1.0)
-        
-        # Combine scores
-        combined = (
-            0.5 * semantic_score + 
-            0.3 * keyphrase_score + 
-            0.2 * content_score
-        ) * context_boost * level_weight
-        
-        # Penalize generic sections
-        if any(gt in title.lower() for gt in self.generic_titles):
-            combined *= 0.7
-            
-        return float(min(max(combined, 0), 1))  # Ensure Python float
+        }.get(level.lower(), 1.0)
+
+        # 6. Generic title penalty (softer, based on how generic)
+        title_lower = title.lower()
+        generic_penalty = 1.0
+        for gt in self.generic_titles:
+            if gt in title_lower:
+                generic_penalty *= 0.8  # less harsh than 0.7
+
+        # Combine weighted score
+        combined_score = (
+            0.65 * semantic_score +
+            0.25 * keyphrase_score +
+            0.10 * content_score
+        ) * context_boost * level_weight * generic_penalty
+
+        return float(min(max(combined_score, 0), 1))  # Ensure within [0,1]
+
+
 
     def _score_content_type(self, text: str, content_type: str) -> float:
         """Score content based on type"""
@@ -328,7 +384,7 @@ class DocumentAnalyzer:
         doc_counts = defaultdict(int)
         
         for rank, (section, score) in enumerate(all_sections, 1):
-            if doc_counts[section.document] >= 2:  # Max 2 sections per doc
+            if doc_counts[section.document] >= 4:  # Max 4 sections per doc
                 continue
                 
             section.importance_rank = rank
@@ -347,6 +403,9 @@ class DocumentAnalyzer:
             
             if len(final_sections) >= 20:  # Limit total sections
                 break
+
+        outline = self.generate_outline(final_sections)
+
         
         # Prepare output with type conversion
         return {
@@ -376,42 +435,142 @@ class DocumentAnalyzer:
                     "semantic_score": float(s.semantic_score)  # Convert numpy float to Python float
                 }
                 for s in sorted(final_subsections, key=lambda x: x.semantic_score, reverse=True)[:30]
-            ]
+            ],
+            "outline": outline
         }
+    
+    def word_overlap(self, a: str, b: str) -> float:
+        """Calculate word overlap ratio between two strings"""
+        a_words = set(a.lower().split())
+        b_words = set(b.lower().split())
+        if not a_words or not b_words:
+            return 0.0
+        return len(a_words & b_words) / len(a_words | b_words)
+
+    def generate_outline(self, document_sections: List[DocumentSection]):
+        seen_titles = set()
+        final_headings = []
+
+        for section in document_sections:
+            title = section.section_title.strip()
+            content = section.content.strip()
+
+            # Skip empty or generic sections
+            if not title or not content:
+                continue
+            if len(title) < 5 or title.lower() in self.generic_titles:
+                continue
+            if len(content.split()) < 40:
+                continue
+
+            # Remove near-duplicate titles
+            title_key = title.lower().replace(" ", "")
+            if any(self.word_overlap(title_key, seen_title) > 0.3 for seen_title in seen_titles):
+                continue
+            seen_titles.add(title_key)
+
+            # Score: combine confidence, inverse rank, and content richness
+            score = (
+                0.4 * section.confidence +
+                0.3 * (1.0 - section.importance_rank / 100.0) +
+                0.3 * min(len(content.split()) / 150.0, 1.0)
+            )
+
+            # Bonus for structured titles (e.g., "1.1 Intro")
+            if re.match(r'^\d+(\.\d+)*', title):
+                score += 0.1
+
+            # Convert to dictionary format
+            section_dict = {
+                'document': section.document,
+                'section_title': section.section_title,
+                'page_number': section.page_number,
+                'content': section.content,
+                'confidence': section.confidence,
+                'importance_rank': section.importance_rank
+            }
+            final_headings.append((score, section_dict))
+
+        # Sort by descending score
+        final_headings.sort(reverse=True, key=lambda x: x[0])
+
+        # Select top 10
+        top_sections = [sec for _, sec in final_headings[:10]]
+
+        return top_sections
+
+    def _deduplicate_headings(self, headings: List[Dict]) -> List[Dict]:
+    # """Remove semantically similar headings using cosine similarity"""
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
+
+        if len(headings) <= 1:
+            return headings
+
+        titles = [h['title'] for h in headings]
+        vectorizer = TfidfVectorizer().fit_transform(titles)
+        similarity_matrix = cosine_similarity(vectorizer)
+
+        to_remove = set()
+        for i in range(len(titles)):
+            for j in range(i + 1, len(titles)):
+                if similarity_matrix[i][j] > 0.85:
+                    to_remove.add(j)
+
+        final = [h for idx, h in enumerate(headings) if idx not in to_remove]
+        return final
+
+
 
 def load_config(input_json: str) -> dict:
-    """Load and validate configuration"""
+    """Load and validate configuration, fallback to auto-detect PDFs in 'inputs/' folder."""
     try:
-        with open(input_json, 'r', encoding='utf-8') as f:
-            config = json.load(f)
-        
-        # Extract documents
+        if os.path.exists(input_json):
+            with open(input_json, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+        else:
+            config = {}
+
+        # Load documents from input.json if present
         documents = []
         for doc in config.get('documents', []):
             if isinstance(doc, str):
                 documents.append(doc)
             elif isinstance(doc, dict) and 'filename' in doc:
                 documents.append(doc['filename'])
-        
+
+        # If documents not found in input.json, auto-detect from ./inputs
+        if not documents:
+            documents = []
+            for file in os.listdir("inputs"):
+                if file.lower().endswith(".pdf"):
+                    documents.append(os.path.join("inputs", file))
+
         # Extract persona
         persona = config.get('persona', '')
         if isinstance(persona, dict):
             persona = persona.get('role', '')
-        
+        if not persona:
+            persona = "Travel Planner"  # default fallback
+
         # Extract job
         job = config.get('job_to_be_done', '')
         if isinstance(job, dict):
             job = job.get('task', '')
-        
+        if not job:
+            job = "Plan a 4-day trip"  # default fallback
+
         return {
             'documents': documents,
             'persona': persona,
             'job': job,
             'config': config
         }
+
     except Exception as e:
         print(f"Error loading config: {e}")
         raise
+
 
 def main():
     parser = argparse.ArgumentParser(description="Enhanced Document Intelligence System")
@@ -428,11 +587,35 @@ def main():
             config['job']
         )
         
-        # Add original config to metadata
-        result['metadata']['config'] = config['config']
+        # Prepare output in evaluation-compatible format
+        output = {
+            'extracted_sections': [
+                {
+                    'document': section['document'],
+                    'section_title': section['section_title'],
+                    'page_number': section['page_number'],
+                    'content': section['content'] if 'content' in section else '',
+                    'score': section['confidence'] if 'confidence' in section else 0.0,
+                    'keyphrases': [kp[0] for kp in analyzer.semantic.extract_keyphrases(section['content'])] if 'content' in section else [],
+                    'subsections': [
+                        {
+                            'text': sub['refined_text'],
+                            'score': sub['semantic_score']
+                        }
+                        for sub in result['subsection_analysis']
+                        if sub['document'] == section['document'] and sub['page_number'] == section['page_number']
+                    ]
+                }
+                for section in result['outline']
+            ],
+            'metadata': {
+                **result['metadata'],
+                'config': config['config']
+            }
+        }
         
         with open(args.output, 'w', encoding='utf-8') as f:
-            json.dump(result, f, indent=2, ensure_ascii=False)
+            json.dump(output, f, indent=2, ensure_ascii=False)
         
         print(f"Success! Results saved to {args.output}")
     
